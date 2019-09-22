@@ -9,6 +9,7 @@ module Chan
 
 import Text.HTML.Scalpel
 import Control.Applicative
+import Control.Monad(guard)
 import qualified Data.ByteString.Lazy.Char8 as L8
 
 type FileName = L8.ByteString
@@ -47,17 +48,17 @@ parseThread body = scrapeStringLike body thread
             Just <$> ((,) <$> ((L8.append "http:") <$> attr "href" fileLink)
                           <*> (spoilered <|> nameTooLong <|> notSpoilered))
 
+        -- alternatives below are defined depending on where to find the
+        -- filename
         spoilered = do
             filename <- attr "title" fileText
-            if filename == L8.empty
-                then empty
-                else return filename
+            guard (filename /= L8.empty)
+            return filename
 
         nameTooLong = do
             filename <- attr "title" fileLink
-            if filename == L8.empty
-                then empty
-                else return filename
+            guard (filename /= L8.empty)
+            return filename
 
         notSpoilered = text fileLink
 
