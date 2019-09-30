@@ -7,24 +7,12 @@ module Chan
     , FileURL
     ) where
 
+import Chan.Types
+
 import Text.HTML.Scalpel
 import Control.Applicative
 import Control.Monad(guard)
 import qualified Data.ByteString.Lazy.Char8 as L8
-
-type FileName = L8.ByteString
-type FileURL = L8.ByteString
-
-data Post = Post
-    { id :: L8.ByteString
-    , content :: L8.ByteString
-    , imgURL :: Maybe (FileURL, FileName)
-    } deriving (Show)
-
-data Thread = Thread
-    { op_post :: Post
-    , reply_posts :: [Post]
-    } deriving (Show)
 
 parseThread :: L8.ByteString -> Maybe Thread
 parseThread body = scrapeStringLike body thread

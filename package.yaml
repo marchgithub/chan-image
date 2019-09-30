@@ -28,6 +28,9 @@ dependencies:
 
 library:
   source-dirs: src
+  exposed-modules:
+      - Chan
+      - Chan.Types
 
 executables:
   chan-image-exe:
