@@ -25,27 +25,28 @@ parseThread body = scrapeStringLike body thread
         opPost =
             Post <$> attr "id" ("div" @: [hasClass "opContainer"])
                  <*> text "blockQuote"
-                 <*> (getFileURL <|> empty)
+                 <*> getFileURL
 
         replyPost =
             Post <$> attr "id" ("div" @: [hasClass "replyContainer"])
                  <*> text "blockQuote"
-                 <*> (getFileURL <|> empty)
+                 <*> getFileURL
 
-        getFileURL =
-            Just <$> ((,) <$> ((L8.append "http:") <$> attr "href" fileLink)
-                          <*> (spoilered <|> nameTooLong <|> notSpoilered))
+        getFileURL = do
+            url <- L8.append "http:" <$> attr "href" fileLink
+            filename <- spoilered <|> nameTooLong <|> notSpoilered
+            return $ Just (url, filename)
 
         -- alternatives below are defined depending on where to find the
         -- filename
         spoilered = do
             filename <- attr "title" fileText
-            guard (filename /= L8.empty)
+            guard $ filename /= L8.empty
             return filename
 
         nameTooLong = do
             filename <- attr "title" fileLink
-            guard (filename /= L8.empty)
+            guard $ filename /= L8.empty
             return filename
 
         notSpoilered = text fileLink
